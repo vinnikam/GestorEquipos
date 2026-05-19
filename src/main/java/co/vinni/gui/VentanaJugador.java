@@ -156,7 +156,7 @@ public class VentanaJugador extends JFrame {
                     .fechaNacimiento(fechaNac)
                     .numeroTelefono(Long.parseLong(telefono))
                     .numero(numero)
-                    .posicion(pos)
+                    .posicion(pos.toString())
                     .equipo(equipoSel)
                     .build();
 

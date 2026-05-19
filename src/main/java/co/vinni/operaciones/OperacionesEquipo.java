@@ -1,5 +1,6 @@
 package co.vinni.operaciones;
 
+import co.vinni.dao.operacionesImp.ImpOperacionesEquipo;
 import co.vinni.datos.Equipo;
 import co.vinni.datos.Jugador;
 import co.vinni.datos.Pais;
@@ -14,10 +15,14 @@ import java.util.Optional;
 
 public class OperacionesEquipo {
     private List<Equipo> listaEquipos;
-    private final String RUTA_ARCHIVO = "equipos.dat";
 
-    public OperacionesEquipo(){
-        this.cargarArchivo();
+    private ImpOperacionesEquipo impOperacionesEquipo;
+
+    public OperacionesEquipo(ImpOperacionesEquipo impOperacionesEquipo){
+        this.impOperacionesEquipo = new ImpOperacionesEquipo();
+        // carga los equipos desde la base de datos.
+        listaEquipos = impOperacionesEquipo.obtenerTodos();
+
     }
 
     /**
@@ -33,32 +38,16 @@ public class OperacionesEquipo {
             Equipo equipo =  Equipo
                     .builder()
                     .nombre(nombre)
-                    .pais(Pais.valueOf(pais))
+                    .pais(pais)
                     .direccion(direccion)
                     .telefono(telefono)
                     .build();
             this.listaEquipos.add(equipo);
-            try {
-                UtilidadArchivos.guardar(this.listaEquipos,RUTA_ARCHIVO );
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        }
-
-    /**
-     * Metodo que verifica si hay información de equipos.
-     */
-    private void cargarArchivo() {
-        try {
-            List<Equipo> datosCargados = UtilidadArchivos.leer(RUTA_ARCHIVO);
-            if (datosCargados != null) {
-                this.listaEquipos = datosCargados;
-            }
-        } catch (Exception e) {
-            this.listaEquipos = new ArrayList<>();
+            // se modifico para almacenar en la base de datos.
+            impOperacionesEquipo.crear(equipo);
         }
     }
+
 
     /**
      * Verifica que el equipo exista por las condiciones nombre y equipo.
@@ -69,7 +58,7 @@ public class OperacionesEquipo {
     public Optional<Equipo> buscarEquipo(String nombre, String pais) {
         return listaEquipos.stream()
                 .filter(e -> e.getNombre().equalsIgnoreCase(nombre)
-                        && e.getPais().name().equalsIgnoreCase(pais))
+                        && e.getPais().equalsIgnoreCase(pais))
                 .findFirst();
     }
     public List<Equipo> obtenerTodos(){
